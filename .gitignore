@@ -1,0 +1,10 @@
+bin/
+obj/
+*.user
+*.lock
+/packages/
+riderModule.iml
+/_ReSharper.Caches
+*.db
+appsettings.json
+.user-secrets/
