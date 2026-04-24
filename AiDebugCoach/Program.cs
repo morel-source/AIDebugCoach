@@ -1,5 +1,6 @@
 using AiDebugCoach.Data;
 using AiDebugCoach.Services;
+using AiDebugCoach.Services.Gemini;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,10 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<BugReportService>();
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(
     builder.Configuration.GetConnectionString("DefaultConnection")
 ));
-builder.Services.AddHttpClient<AiService>();
+
+builder.AddGemini();
 
 var app = builder.Build();
 

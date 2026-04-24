@@ -1,4 +1,4 @@
-namespace AiDebugCoach.Models;
+namespace AiDebugCoach.Models.ViewModels;
 
 public class ErrorViewModel
 {

@@ -7,4 +7,5 @@ riderModule.iml
 /_ReSharper.Caches
 *.db
 appsettings.json
+appsettings.Development.json
 .user-secrets/

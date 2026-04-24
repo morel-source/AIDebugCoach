@@ -1,78 +1,142 @@
-﻿@model List<AiDebugCoach.Models.BugReport>
+﻿@model IEnumerable<AiDebugCoach.Models.ViewModels.BugReportViewModel>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["Error"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+@{
+    ViewData["Title"] = "AI Debug Coach";
 }
 
-<div class="container my-3" style="max-width: 800px;">
-    <div class="card shadow-sm p-3 mb-4 bg-white rounded border">
-        <h4 class="mb-3 text-primary">AI Debug Coach</h4>
-        <form method="post" asp-action="Analyze">
-            <div class="mb-2">
-                <label class="form-label small fw-bold">Paste Code</label>
-                <textarea name="code" class="form-control form-control-sm" rows="4"
-                          placeholder="Paste your code here..."></textarea>
-            </div>
+<div class="container-fluid mt-4">
+    <div class="row g-4">
+        <main class="col-lg-8">
+            <div class="card p-4">
+                @if (ViewBag.SelectedReport != null)
+                {
+                    var r = (AiDebugCoach.Models.ViewModels.BugReportViewModel)ViewBag.SelectedReport;
+                    var analysis = r.Analysis;
 
-            <div class="mb-2">
-                <label class="form-label small fw-bold">Error Message</label>
-                <textarea name="errorMessage" class="form-control form-control-sm" rows="2"
-                          placeholder="What went wrong?"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-sm mt-1">Analyze</button>
-        </form>
-    </div>
-
-    <div class="container my-3" style="max-width: 800px;">
-        <h5 class="mb-3">Previous Debugs</h5>
-
-        @foreach (var item in Model)
-        {
-            // One clean line to get the data
-            var analysis = item.GetAnalysis();
-
-            <div class="card mb-4 shadow-sm border-0 rounded-3 overflow-hidden">
-                <div class="card-header bg-light border-0 d-flex justify-content-between align-items-center py-2 px-3">
-                    <span class="text-muted small fw-bold">@item.CreatedAt.ToString("g")</span>
-                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
-                          onsubmit="return confirm('Delete?');">
-                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">Delete</button>
-                    </form>
-                </div>
-
-                <div class="card-body p-3">
-                    <div class="mb-3 border-bottom pb-2">
-                        <h6 class="text-uppercase text-secondary small fw-bold mb-1">Problem</h6>
-                        <div class="alert alert-secondary py-1 px-2 small mb-2">@item.ErrorMessage</div>
-                        <pre class="bg-dark text-light p-3 rounded small"><code>@item.Code</code></pre>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Analysis Details</h4>
+                        <a href="/" class="btn btn-outline-secondary btn-sm">New Analysis</a>
                     </div>
+
+                    <div class="mb-4">
+                        <span class="text-muted">Error</span>
+                        <p class="fw-bold">@r.ErrorMessage</p>
+                    </div>
+
+                    <pre><code>@r.Code</code></pre>
 
                     @if (analysis != null)
                     {
-                        <div class="mb-3">
-                            <h6 class="text-uppercase text-primary small fw-bold mb-1">Root Cause</h6>
-                            <p class="text-dark mb-3">@analysis.Cause</p>
-                        </div>
+                        <hr class="my-4"/>
+                        <h5 class="text-primary">AI Insights</h5>
+                        <p><strong>Cause:</strong> @analysis.Cause</p>
+                        <p><strong>Explanation:</strong> @analysis.Explanation</p>
 
-                        <div class="bg-success bg-opacity-10 p-3 rounded">
-                            <h6 class="text-uppercase text-success small fw-bold mb-1">Suggested Fix</h6>
-                            <div class="ai-response-text text-success-emphasis">@analysis.Fix</div>
+                        <h6 class="mt-3">Fix Steps:</h6>
+                        <ol class="list-group list-group-numbered mb-3">
+                            @foreach (var step in analysis.FixSteps)
+                            {
+                                <li class="list-group-item border-0">@step</li>
+                            }
+                        </ol>
+
+                        <h6 class="mt-3">Code Example:</h6>
+                        <pre><code>@analysis.CodeExamples</code></pre>
+                    }
+                }
+                else
+                {
+                    <h4 class="mb-3">New Analysis</h4>
+                    <form id="analysisForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Code</label>
+                            <textarea name="code" class="form-control" rows="8" placeholder="Paste your code..."
+                                      required></textarea>
                         </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Error Message</label>
+                            <textarea name="errorMessage" class="form-control" rows="2" placeholder="What went wrong?"
+                                      required></textarea>
+                        </div>
+                        <button type="submit" id="analyzeBtn" class="btn btn-primary w-100 btn-lg">
+                            <span id="btnText">Analyze with AI</span>
+                        </button>
+                    </form>
+                    <div id="resultContainer" class="mt-4"></div>
+                }
+            </div>
+        </main>
+
+        <aside class="col-lg-4">
+            <div class="card sidebar-container">
+                <div class="card-header">
+                    <h5 class="mb-0">History</h5>
+                </div>
+                <div class="scroll-area">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <a asp-action="Index" asp-route-id="@item.Id"
+                               class="list-group-item list-group-item-action history-item border-0 p-3">
+                                <small class="text-muted d-block">@item.FormattedDate</small>
+                                <p class="mb-0 text-truncate fw-medium text-dark">@item.ErrorMessage</p>
+                            </a>
+                        }
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">No history found.</div>
                     }
                 </div>
             </div>
-        }
+        </aside>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-    document.querySelectorAll('.ai-response-text').forEach(el => {
-        el.innerHTML = marked.parse(el.innerText);
+    const form = document.getElementById('analysisForm');
+    const btn = document.getElementById('analyzeBtn');
+    const btnText = document.getElementById('btnText');
+    const resultContainer = document.getElementById('resultContainer');
+
+    form?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        btn.disabled = true;
+        btnText.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Thinking...';
+
+        try {
+            const response = await fetch('/Home/Analyze', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    code: form.querySelector('[name="code"]').value,
+                    errorMessage: form.querySelector('[name="errorMessage"]').value
+                })
+            });
+
+            if (!response.ok) throw new Error(await response.text() || "Failed to analyze.");
+
+            const data = await response.json();
+            const res = data.result;
+
+            const fixHtml = res.fixSteps.map(s => `<li class="list-group-item border-0">${s}</li>`).join('');
+
+            resultContainer.innerHTML = `
+                <div class="alert alert-success">Analysis complete!</div>
+                <h5 class="text-primary">Result</h5>
+                <p><strong>Cause:</strong> ${res.cause}</p>
+                <p><strong>Explanation:</strong> ${res.explanation}</p>
+                <h6>Fix Steps:</h6>
+                <ol class="list-group list-group-numbered mb-3">${fixHtml}</ol>
+                <pre><code>${res.codeExamples}</code></pre>
+                <a href="/" class="btn btn-outline-primary mt-3">Analyze Another</a>
+            `;
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            btn.disabled = false;
+            btnText.innerText = 'Analyze with AI';
+        }
     });
 </script>

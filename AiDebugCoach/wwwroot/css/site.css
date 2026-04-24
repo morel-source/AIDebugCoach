@@ -1,42 +1,97 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+/* --- Global Styles --- */
+:root {
+    --primary-color: #2563eb;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
 }
 
 body {
-  margin-bottom: 60px;
+    background-color: var(--bg-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* --- Layout --- */
+.container-fluid {
+    max-width: 1200px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* --- Cards --- */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
 }
 
-.ai-response-text {
-  line-height: 1.6;
-  color: #333;
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem;
 }
-.ai-response-text strong {
-  color: #000;
+
+/* --- Sidebar --- */
+.sidebar-container {
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
 }
-.ai-response-text ol {
-  padding-left: 20px;
+
+.scroll-area {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.history-item {
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.history-item:hover {
+    background-color: #f9fafb;
+}
+
+.history-item.active {
+    background-color: #eff6ff;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* --- Forms & Buttons --- */
+.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* --- Code Blocks --- */
+pre {
+    background: #1e1e1e !important;
+    color: #d4d4d4;
+    padding: 1.5rem !important;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+
+/* --- Typography --- */
+.text-muted {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
 }
