@@ -24,4 +24,4 @@ An AI-powered debugging assistant that analyzes C# code errors and provides acti
 ---
 
 ### Screenshots
-![Ai Debug Caoch Screenshot](./ai_debug_caoch.png)
+![Ai Debug Caoch Screenshot](./ai_debug_coach.png)
